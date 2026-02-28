@@ -23,13 +23,14 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import (
     accuracy_score, classification_report, confusion_matrix,
-    mean_squared_error, r2_score, silhouette_score
+    mean_squared_error, r2_score, silhouette_score,
+    precision_score, recall_score, f1_score
 )
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_text
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
-    GradientBoostingClassifier
+    GradientBoostingClassifier, GradientBoostingRegressor
 )
 from sklearn.svm import SVC, SVR
 from sklearn.neighbors import KNeighborsClassifier
@@ -821,7 +822,6 @@ print(classification_report(y_test, y_pred))"""
             precisions, recalls, f1s, accs = [], [], [], []
             for t in thresholds:
                 yp = (probs >= t).astype(int)
-                from sklearn.metrics import precision_score, recall_score, f1_score
                 precisions.append(precision_score(y2, yp, zero_division=0))
                 recalls.append(recall_score(y2, yp, zero_division=0))
                 f1s.append(f1_score(y2, yp, zero_division=0))
@@ -1531,7 +1531,7 @@ elif "Build" in module:
         return X, y
 
     X_gen, y_gen = generate_data(task_type, n_samp, n_feat, n_info, noise_d,
-                                  n_classes=(3 if task_type=="Classification" else 2))
+                                  n_classes=(n_cl if task_type == "Classification" else 2))
 
     st.markdown(f"#### 📦 Generated Dataset: {n_samp} samples × {n_feat} features")
     df_gen = pd.DataFrame(X_gen, columns=[f"feature_{i+1}" for i in range(n_feat)])
@@ -1618,8 +1618,7 @@ elif "Build" in module:
         else:  # Regression
             r_map = {
                 "Random Forest":   RandomForestRegressor(n_estimators=100, random_state=42),
-                "Gradient Boosting":GradientBoostingClassifier(n_estimators=100, random_state=42) if False
-                                    else __import__('sklearn.ensemble', fromlist=['GradientBoostingRegressor']).GradientBoostingRegressor(n_estimators=100, random_state=42),
+                "Gradient Boosting":GradientBoostingRegressor(n_estimators=100, random_state=42),
                 "Linear Regression": LinearRegression(),
                 "Ridge Regression":  Ridge(alpha=1.0),
                 "Decision Tree":   DecisionTreeRegressor(max_depth=8, random_state=42),
